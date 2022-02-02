@@ -72,7 +72,12 @@
             cd \$FOLDER
             cp /opt/mapr/kubernetes/template.cnf my.cnf
             printf '\nDNS.4 = {{ gateway_pub_dns }}\n' >> my.cnf
+            sed -i -r 's/\{service\}/mcs-svc/g' my.cnf
+            sed -i -r 's/\{namespace\}/dfdemo/g' my.cnf
+            sed -i -r 's/\{private-key-subject-cn\}/*.maprwebserver-svc.mycluster.svc.cluster.local/g'
             edftool gen-csrs -t my.cnf -y
+            openssl x509 -req -in dfdemo-mcs-svc.csr -CA minica.pem -CAkey minica-key.pem -CAcreateserial -out dfdemo-mcs-svc.crt -days 500 -sha256 -extensions 'v3_req' -extfile <(cat my.cnf )
+            # TODO edftool import-certs ...
             "
 
 
@@ -94,4 +99,3 @@
 
     - name: add ad_user1
       shell: "{{ kubectl_dfdemo }} exec admincli-0 -- maprcli acl edit -type cluster -user ad_user1:login"
-      
