@@ -59,6 +59,23 @@
       # delay: 60
       # until: result is not failed
 
+- name: configure picasso MCS TLS
+  hosts: localhost
+  vars:
+    kubeexec_dfdemo: "kubectl --kubeconfig {{ ansible_env.HOME }}/.kube/config -n dfdemo exec admincli-0 -- "
+  tasks:
+    - name: gencsr
+      shell: >
+          {{ kubeexec_dfdemo }} bash -c "
+            FOLDER=/tmp/ansible-gencsr-$(date -u +'%FT%H%M%SZ')
+            mkdir \$FOLDER
+            cd \$FOLDER
+            cp /opt/mapr/kubernetes/template.cnf my.cnf
+            printf '\nDNS.4 = {{ gateway_pub_dns }}\n' >> my.cnf
+            edftool gen-csrs -t my.cnf -y
+            "
+
+
 - name: configure picasso DF users
   hosts: localhost
   vars:
@@ -77,3 +94,4 @@
 
     - name: add ad_user1
       shell: "{{ kubectl_dfdemo }} exec admincli-0 -- maprcli acl edit -type cluster -user ad_user1:login"
+      
