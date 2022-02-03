@@ -87,7 +87,7 @@
     kubectl_dfdemo: "kubectl --kubeconfig {{ ansible_env.HOME }}/.kube/config -n dfdemo "
     kubeexec_dfdemo: "kubectl --kubeconfig {{ ansible_env.HOME }}/.kube/config -n dfdemo exec admincli-0 -- "
   tasks:
-  
+
     - name: Collect current timestamp
       shell: "echo /tmp/ansible-tls-$(date +%d%b%y_%H-%M-%S)"
       register: work_folder
@@ -113,8 +113,7 @@
             edftool gen-csrs -t my.cnf -y
             openssl x509 -req -in dfdemo-mcs-svc.csr -CA minica.pem -CAkey minica-key.pem -CAcreateserial -out dfdemo-mcs-svc.crt -days 500 -sha256 -extensions 'v3_req' -extfile <(cat my.cnf)
             edftool import-certs -y
-            yes Y | edf update cluster
+            # yes Y | edf update cluster # not required if only updating mcs?
             "
     - name: restart pod
       shell: "{{ kubectl_dfdemo }} delete pod mcs-0"
-
