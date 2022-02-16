@@ -1,7 +1,0 @@
-ansible
-Flask[async]
-Flask-Cors
-hpecp
-Jinja2
-Werkzeug
-waitress
